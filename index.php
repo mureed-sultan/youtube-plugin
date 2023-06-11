@@ -148,51 +148,52 @@ function mureedsultan_options_page()
     <script>
             jQuery(document).ready(function($) {
                 // Fetch Podcasts Button Click Event
-                $('#mureedsultan_podcastfetch').click(function() {
-                    var buzzsproutId = $('input[name="mureedsultan_buzzsprout_id"]').val();
-                    var buzzsproutToken = $('input[name="mureedsultan_buzzsprout_token"]').val();
+           // Fetch Podcasts Button Click Event
+           $('#mureedsultan_podcastfetch').click(function() {
+    var buzzsproutId = $('input[name="mureedsultan_buzzsprout_id"]').val();
+    var buzzsproutToken = $('input[name="mureedsultan_buzzsprout_token"]').val();
 
-                    var data = {
-                        action: 'mureedsultan_fetch_podcasts',
-                        buzzsprout_id: buzzsproutId,
-                        buzzsprout_token: buzzsproutToken
-                    };
+    // Perform AJAX request to fetch podcasts
+    $.ajax({
+        url: 'https://www.buzzsprout.com/api/' + buzzsproutId + '/episodes.json',
+        type: 'GET',
+        headers: {
+            'Authorization': 'Token ' + buzzsproutToken
+        },
+        success: function(response) {
+            console.log(response);
+            // Handle the response and display data in the console
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error:', error);
+        }
+    });
+});
 
-                    // Send AJAX request
-                    $.post(mureedsultan_ajax_object.ajaxurl, data, function(response) {
-                        console.log(response);
-                        if (response.success) {
 
-                            var count = response.data;
-                            $('#mureedsultan_fetch_status').text('Fetched ' + count + ' podcasts.');
-                        } else {
-                            $('#mureedsultan_fetch_status').text('Error: ' + response.data);
-                        }
-                    });
-                });
+    $('#mureedsultan_podcastpush').click(function() {
+        var buzzsproutId = $('input[name="mureedsultan_buzzsprout_id"]').val();
+        var buzzsproutToken = $('input[name="mureedsultan_buzzsprout_token"]').val();
+        var postCategory = $('#mureedsultan_category').val();
 
-                $('#mureedsultan_podcastpush').click(function() {
-                    var buzzsproutId = $('input[name="mureedsultan_buzzsprout_id"]').val();
-                    var buzzsproutToken = $('input[name="mureedsultan_buzzsprout_token"]').val();
-                    var postCategory = $('#mureedsultan_category').val();
-
-                    var data = {
-                        action: 'mureedsultan_push_podcasts',
-                        buzzsprout_id: buzzsproutId,
-                        buzzsprout_token: buzzsproutToken,
-                        post_category: postCategory
-                    };
-
-                    $.post(mureedsultan_ajax_object.ajaxurl, data, function(response) {
-                        if (response.success) {
-                            var count = response.data;
-                            $('#mureedsultan_push_status').text('Pushed ' + count + ' podcasts to posts.');
-                        } else {
-                            $('#mureedsultan_push_status').text('Error: ' + response.data);
-                        }
-                    });
-                });
-            });
+        // Perform AJAX request to push podcasts
+        $.ajax({
+            url: '<?php echo admin_url('admin-ajax.php'); ?>',
+            type: 'POST',
+            data: {
+                action: 'mureedsultan_push_podcasts',
+                buzzsprout_id: buzzsproutId,
+                buzzsprout_token: buzzsproutToken
+            },
+            success: function(response) {
+                console.log(response);
+                // Handle the response and display data in the console
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX error:', error);
+            }
+        });
+    });
             // asdasdas
 
 
@@ -328,7 +329,6 @@ function mureedsultan_fetch_podcasts()
 
     // Fetch data from the Buzzsprout API
     $response = wp_remote_get($api_url);
-
     if (is_wp_error($response)) {
         wp_send_json_error('Failed to fetch data from the Buzzsprout API.');
     }
@@ -346,6 +346,7 @@ function mureedsultan_fetch_podcasts()
 
     wp_send_json_success($count);
 }
+
 
 add_action('wp_ajax_mureedsultan_push_podcasts', 'mureedsultan_push_podcasts');
 function mureedsultan_push_podcasts()
