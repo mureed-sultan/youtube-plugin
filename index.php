@@ -70,7 +70,7 @@ function mureedsultan_options_page()
 
         echo '<div class="notice notice-success"><p>Settings updated successfully.</p></div>';
     }
-?>
+    ?>
 
     <div class="wrap">
         <h1>Mureed Sultan Plugin Settings</h1>
@@ -79,13 +79,15 @@ function mureedsultan_options_page()
                 <tr>
                     <th scope="row"><label for="mureedsultan_api_key">YouTube API Key</label></th>
                     <td>
-                        <input type="text" id="mureedsultan_api_key" name="mureedsultan_api_key" value="<?php echo esc_attr($api_key); ?>" class="regular-text">
+                        <input type="text" id="mureedsultan_api_key" name="mureedsultan_api_key"
+                            value="<?php echo esc_attr($api_key); ?>" class="regular-text">
                     </td>
                 </tr>
                 <tr>
                     <th scope="row"><label for="mureedsultan_channel_id">YouTube Channel ID</label></th>
                     <td>
-                        <input type="text" id="mureedsultan_channel_id" name="mureedsultan_channel_id" value="<?php echo esc_attr($channel_id); ?>" class="regular-text">
+                        <input type="text" id="mureedsultan_channel_id" name="mureedsultan_channel_id"
+                            value="<?php echo esc_attr($channel_id); ?>" class="regular-text">
                     </td>
                 </tr>
                 <tr>
@@ -113,32 +115,65 @@ function mureedsultan_options_page()
 
                     <th scope="row"><label for="mureedsultan_time">Time Format (HH:MM)</label></th>
                     <td>
-                        <input type="text" id="mureedsultan_time" name="mureedsultan_time" value="<?php echo esc_attr(get_option('mureedsultan_time')); ?>" class="regular-text">
+                        <input type="text" id="mureedsultan_time" name="mureedsultan_time"
+                            value="<?php echo esc_attr(get_option('mureedsultan_time')); ?>" class="regular-text">
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row"></th>
                     <td>
-                        <input type="button" name="mureedsultan_fetch" id="mureedsultan_fetch" class="button-secondary" value="Fetch Playlists">
-                        <input type="button" name="mureedsultan_push" id="mureedsultan_push" class="button-primary" value="Push Videos">
+                        <input type="button" name="mureedsultan_fetch" id="mureedsultan_fetch" class="button-secondary"
+                            value="Fetch Playlists">
+                        <input type="button" name="mureedsultan_push" id="mureedsultan_push" class="button-primary"
+                            value="Push Videos">
                     </td>
                 </tr>
                 <tr>
                     <th scope="row">Buzzsprout ID:</th>
-                    <td><input type="text" name="mureedsultan_buzzsprout_id" value="<?php echo esc_attr($buzzsprout_id); ?>" class="regular-text"></td>
+                    <td>
+                        <input type="text" name="mureedsultan_buzzsprout_id" value="<?php echo esc_attr($buzzsprout_id); ?>"
+                            class="regular-text">
+                    </td>
                 </tr>
                 <tr>
                     <th scope="row">Buzzsprout API Token:</th>
-                    <td><input type="text" name="mureedsultan_buzzsprout_token" value="<?php echo esc_attr($buzzsprout_token); ?>" class="regular-text"></td>
+                    <td>
+                        <input type="text" name="mureedsultan_buzzsprout_token"
+                            value="<?php echo esc_attr($buzzsprout_token); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">
+                        <label for="mureedsultan_buzzprout_category">Post Category:</label>
+                    </th>
+                    <td>
+                        <select id="mureedsultan_buzzprout_category" name="mureedsultan_buzzprout_category">
+                            <?php
+                            $categories = get_terms('category', 'orderby=name&hide_empty=0');
+                            foreach ($categories as $category) {
+                                echo '<option value="' . esc_attr($category->term_id) . '">' . esc_html($category->name) . '</option>';
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Buzzsprout push count:</th>
+                    <td>
+                        <input type="text" name="mureedsultan_push_count" id="mureedsultan_push_count" class="regular-text">
+                    </td>
                 </tr>
                 <tr>
                     <th scope="row"></th>
                     <td>
-                        <input type="button" name="mureedsultan_fetch" id="mureedsultan_podcastfetch" class="button-secondary" value="Fetch podcast">
-                        <input type="button" name="mureedsultan_push" id="mureedsultan_podcastpush" class="button-primary" value="Push podcast">
+                        <input type="button" name="mureedsultan_fetch" id="mureedsultan_podcastfetch"
+                            class="button-secondary" value="Fetch podcast">
+                        <input type="button" name="mureedsultan_push" id="mureedsultan_podcastpush" class="button-primary"
+                            value="Push podcast">
                     </td>
                 </tr>
+
             </table>
             <input type="submit" name="mureedsultan_submit" class="button-primary" value="Save Settings">
         </form>
@@ -146,61 +181,98 @@ function mureedsultan_options_page()
         <div id="mureedsultan_push_status"></div>
     </div>
     <script>
-            jQuery(document).ready(function($) {
-                // Fetch Podcasts Button Click Event
-           // Fetch Podcasts Button Click Event
-           $('#mureedsultan_podcastfetch').click(function() {
-    var buzzsproutId = $('input[name="mureedsultan_buzzsprout_id"]').val();
-    var buzzsproutToken = $('input[name="mureedsultan_buzzsprout_token"]').val();
+        jQuery(document).ready(function ($) {
+            // Fetch Podcasts Button Click Event
+            // Fetch Podcasts Button Click Event
+            $('#mureedsultan_podcastfetch').click(function () {
+                var buzzsproutId = $('input[name="mureedsultan_buzzsprout_id"]').val();
+                var buzzsproutToken = $('input[name="mureedsultan_buzzsprout_token"]').val();
 
-    // Perform AJAX request to fetch podcasts
-    $.ajax({
-        url: 'https://www.buzzsprout.com/api/' + buzzsproutId + '/episodes.json',
-        type: 'GET',
-        headers: {
-            'Authorization': 'Token ' + buzzsproutToken
-        },
-        success: function(response) {
-            console.log(response);
-            // Handle the response and display data in the console
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX error:', error);
-        }
-    });
-});
+                // Perform AJAX request to fetch podcasts
+                $.ajax({
+                    url: 'https://www.buzzsprout.com/api/' + buzzsproutId + '/episodes.json',
+                    type: 'GET',
+                    headers: {
+                        'Authorization': 'Token ' + buzzsproutToken
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        // Handle the response and display data in the console
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX error:', error);
+                    }
+                });
+            });
 
 
-    $('#mureedsultan_podcastpush').click(function() {
-        var buzzsproutId = $('input[name="mureedsultan_buzzsprout_id"]').val();
-        var buzzsproutToken = $('input[name="mureedsultan_buzzsprout_token"]').val();
-        var postCategory = $('#mureedsultan_category').val();
+            $('#mureedsultan_podcastpush').on('click', function () {
+                var selectedPlaylistId = $('#mureedsultan_playlist').val();
+                var selectedCategoryId = $('#mureedsultan_buzzprout_category').val();
+                var pushCount = parseInt($('#mureedsultan_push_count').val());
 
-        // Perform AJAX request to push podcasts
-        $.ajax({
-            url: '<?php echo admin_url('admin-ajax.php'); ?>',
-            type: 'POST',
-            data: {
-                action: 'mureedsultan_push_podcasts',
-                buzzsprout_id: buzzsproutId,
-                buzzsprout_token: buzzsproutToken
-            },
-            success: function(response) {
-                console.log(response);
-                // Handle the response and display data in the console
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX error:', error);
-            }
-        });
-    });
+                if (selectedCategoryId && pushCount) {
+                    var buzzsproutId = $('input[name="mureedsultan_buzzsprout_id"]').val();
+                    var buzzsproutToken = $('input[name="mureedsultan_buzzsprout_token"]').val();
+                    var apiUrl = `https://www.buzzsprout.com/api/${buzzsproutId}/episodes.json?api_token=${buzzsproutToken}`;
+
+                    // Fetch data from the Buzzsprout API
+                    $.ajax({
+                        url: apiUrl,
+                        type: 'GET',
+                        success: function (response) {
+                            console.log(response.length);
+                            var episodes = response;
+                            if (episodes.length > 0) {
+                                // Sort episodes by date (if required)
+
+                                // Limit the number of episodes to push
+                                episodes = episodes.slice(0, pushCount);
+
+                                // Process each episode and push to database
+                                episodes.forEach(function (episode) {
+                                    var postData = {
+                                        post_title: episode.title,
+                                        post_content: episode.description,
+                                        post_status: 'publish',
+                                        post_category: [selectedCategoryId]
+                                    };
+
+                                    // Perform AJAX request to create a new post
+                                    $.ajax({
+                                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                                        type: 'POST',
+                                        data: {
+                                            action: 'mureedsultan_create_post',
+                                            post_data: postData
+                                        },
+                                        success: function (response) {
+                                            console.log('Post created:', response.data.post_id);
+                                            // Handle success, if required
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error('AJAX error:', error);
+                                        }
+                                    });
+                                });
+                            } else {
+                                console.log('No episodes found.');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX error:', error);
+                        }
+                    });
+                }
+            });
+
             // asdasdas
 
 
 
             var playlistVideos = [];
 
-            $('#mureedsultan_fetch').on('click', function() {
+            $('#mureedsultan_fetch').on('click', function () {
                 var api_key = $('#mureedsultan_api_key').val();
                 var channel_id = $('#mureedsultan_channel_id').val();
 
@@ -213,14 +285,14 @@ function mureedsultan_options_page()
                         key: api_key,
                         maxResults: 50
                     },
-                    success: function(response) {
+                    success: function (response) {
                         var playlists = response.items;
 
                         // Populate the dropdown with fetched playlists
                         var dropdown = $('#mureedsultan_playlist');
                         dropdown.empty();
 
-                        $.each(playlists, function(index, playlist) {
+                        $.each(playlists, function (index, playlist) {
                             var option = $('<option></option>').attr('value', playlist.id).text(playlist.snippet.title);
                             dropdown.append(option);
                         });
@@ -228,13 +300,13 @@ function mureedsultan_options_page()
                         // Reset the playlist videos array
                         playlistVideos = [];
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.log('AJAX error:', error);
                     }
                 });
             });
 
-            $('#mureedsultan_push').on('click', function() {
+            $('#mureedsultan_push').on('click', function () {
                 var selectedPlaylistId = $('#mureedsultan_playlist').val();
                 var selectedCategoryId = $('#mureedsultan_category').val();
                 if (selectedPlaylistId && selectedCategoryId) {
@@ -249,11 +321,11 @@ function mureedsultan_options_page()
                             key: api_key,
                             maxResults: 50 // Change this value to the desired maximum number of videos per playlist
                         },
-                        success: function(response) {
+                        success: function (response) {
                             var videos = response.items;
                             processVideos(videos, selectedCategoryId, api_key);
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             console.error('AJAX error:', error);
                         }
                     });
@@ -284,7 +356,7 @@ function mureedsultan_options_page()
                         categoryId: selectedCategoryId,
                         apiKey: api_key
                     },
-                    success: function(response) {
+                    success: function (response) {
                         console.log(response);
                         // Handle the response as needed
 
@@ -293,14 +365,14 @@ function mureedsultan_options_page()
                             processVideos(videos, selectedCategoryId, api_key);
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error('AJAX error:', error);
                     }
                 });
             }
         });
     </script>
-<?php
+    <?php
 }
 
 
@@ -398,11 +470,6 @@ function mureedsultan_push_podcasts()
 
     wp_send_json_success($count);
 }
-
-
-
-
-
 function get_youtube_video_thumbnail($videoId, $apiKey)
 {
     $url = 'https://www.googleapis.com/youtube/v3/videos';
@@ -441,21 +508,51 @@ function mureedsultan_create_post_callback()
     $categoryId = intval($_POST['categoryId']);
     $apiKey = sanitize_text_field($_POST['apiKey']);
 
-    // Get the YouTube video thumbnail
-    $thumbnail = get_youtube_video_thumbnail($videoId, $apiKey);
+    // Check if a post with the same video ID already exists
+    $existing_post = get_posts(array(
+        'post_type' => 'post',
+        'meta_query' => array(
+            array(
+                'key' => 'video_id',
+                'value' => $videoId
+            )
+        ),
+        'posts_per_page' => 1
+    ));
 
-    $post_args = array(
-        'post_title' => $title,
-        'post_content' => $description,
-        'post_status' => 'publish',
-        'post_category' => array($categoryId)
-    );
+    if (!empty($existing_post)) {
+        // Update the existing post instead of creating a new one
+        $post_id = $existing_post[0]->ID;
 
-    $post_id = wp_insert_post($post_args);
+        $post_args = array(
+            'ID' => $post_id,
+            'post_title' => $title,
+            'post_content' => $description,
+            'post_status' => 'publish',
+            'post_category' => array($categoryId)
+        );
+
+        $post_id = wp_update_post($post_args);
+    } else {
+        // Create a new post
+        $post_args = array(
+            'post_title' => $title,
+            'post_content' => $description,
+            'post_status' => 'publish',
+            'post_category' => array($categoryId)
+        );
+
+        $post_id = wp_insert_post($post_args);
+
+        // Add a custom field to store the video ID
+        if ($post_id) {
+            update_post_meta($post_id, 'video_id', $videoId);
+        }
+    }
 
     if ($post_id) {
-        // Add a custom field to store the video ID
-        update_post_meta($post_id, 'video_id', $videoId);
+        // Get the YouTube video thumbnail
+        $thumbnail = get_youtube_video_thumbnail($videoId, $apiKey);
 
         // Set the thumbnail as the featured image
         if (!empty($thumbnail)) {
@@ -472,9 +569,10 @@ function mureedsultan_create_post_callback()
         // Send the number of pushed videos as a response
         wp_send_json_success(array('pushedVideosCount' => 1));
     } else {
-        wp_send_json_error('Failed to create a post. Error: ' . get_last_error_message());
+        wp_send_json_error('Failed to create/update a post. Error: ' . get_last_error_message());
     }
 }
+
 
 // Function to get YouTube video thumbnail
 
