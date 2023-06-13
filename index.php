@@ -104,12 +104,56 @@ function mureedsultan_options_page()
                         <input type="text" id="mureedsultan_time" name="mureedsultan_time" value="<?php echo esc_attr(get_option('mureedsultan_time')); ?>" class="regular-text">
                     </td>
                 </tr>
-
                 <tr>
                     <th scope="row"></th>
                     <td>
                         <input type="button" name="mureedsultan_fetch" id="mureedsultan_fetch" class="button-secondary" value="Fetch Playlists">
                         <input type="button" name="mureedsultan_push" id="mureedsultan_push" class="button-primary" value="Push Videos">
+                    </td>
+                </tr>
+                <!-- Buzzpropt section start  -->
+                <tr>
+                    <th scope="row"><label for="mureedsultan_buzzprout_id">Buzzsprout ID</label></th>
+                    <td>
+                        <input type="text" id="mureedsultan_buzzprout_id" name="mureedsultan_buzzprout_id" value="<?php echo esc_attr($buzzprout_id); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="mureedsultan_buzzprout_api_key">Buzzsprout API Key</label></th>
+                    <td>
+                        <input type="text" id="mureedsultan_buzzprout_api_key" name="mureedsultan_buzzprout_api_key" value="<?php echo esc_attr($buzzprout_api_key); ?>" class="regular-text">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="mureedsultan_category">Post Category</label></th>
+                    <td>
+                        <select id="mureedsultan_category" name="mureedsultan_category">
+                            <?php
+                            $categories = get_terms('category', 'orderby=name&hide_empty=0');
+                            foreach ($categories as $category) {
+                                echo '<option value="' . esc_attr($category->term_id) . '">' . esc_html($category->name) . '</option>';
+                            }
+                            ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="mureedsultan_time">Time to Update (minutes)</label></th>
+                    <td>
+                        <input type="number" id="mureedsultan_time" name="mureedsultan_time" value="<?php echo esc_attr(get_option('mureedsultan_time')); ?>" class="regular-text" min="1">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="mureedsultan_num_podcasts">Number of Podcasts</label></th>
+                    <td>
+                        <input type="number" id="mureedsultan_num_podcasts" name="mureedsultan_num_podcasts" value="<?php echo esc_attr($num_podcasts); ?>" class="regular-text" min="1">
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"></th>
+                    <td>
+                        <input type="button" name="mureedsultan_podcast_fetch" id="mureedsultan_podcast_fetch" class="button-secondary" value="Fetch Podcasts">
+                        <input type="button" name="mureedsultan_podcast_push" id="mureedsultan_podcast_push" class="button-primary" value="Push Podcasts">
                     </td>
                 </tr>
             </table>
@@ -120,8 +164,27 @@ function mureedsultan_options_page()
     </div>
     <script>
         jQuery(document).ready(function($) {
+            // podcast data 
+            $('#mureedsultan_podcast_fetch').on('click', function() {
+                var api_token = $('#mureedsultan_buzzprout_api_key').val();
+                var buzzprout_id = $('#mureedsultan_buzzprout_id').val();
+                console.log(api_token, buzzprout_id)
+                // Perform AJAX request to fetch podcast data
+                $.ajax({
+                    url: 'https://www.buzzsprout.com/api/' + buzzprout_id + '/episodes.json',
+                    data: {
+                        api_token: api_token
+                    },
+                    success: function(response) {
+                        console.log(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX error:', error);
+                    }
+                });
+            });
+            // Youtube section data fetching
             var playlistVideos = [];
-
             $('#mureedsultan_fetch').on('click', function() {
                 var api_key = $('#mureedsultan_api_key').val();
                 var channel_id = $('#mureedsultan_channel_id').val();
@@ -271,16 +334,18 @@ function mureedsultan_create_post_callback()
     $videoCategory = isset($_POST['videoCategory']) ? sanitize_text_field($_POST['videoCategory']) : '';
     $description = format_description($rawDescription);
 
-    $existing_post = get_posts(array(
-        'post_type' => 'post',
-        'meta_query' => array(
-            array(
-                'key' => 'video_id',
-                'value' => $videoId
-            )
-        ),
-        'posts_per_page' => 1
-    ));
+    $existing_post = get_posts(
+        array(
+            'post_type' => 'post',
+            'meta_query' => array(
+                array(
+                    'key' => 'video_id',
+                    'value' => $videoId
+                )
+            ),
+            'posts_per_page' => 1
+        )
+    );
     if (!empty($existing_post)) {
         $post_id = $existing_post[0]->ID;
 
@@ -349,9 +414,10 @@ function mureedsultan_create_post_callback()
     };
 }
 
-function format_description($description) {
+function format_description($description)
+{
     // Convert URLs to clickable links
-    $description = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($matches) {
+    $description = preg_replace_callback('/(https?:\/\/[^\s]+)/', function ($matches) {
         return '<a href="' . $matches[0] . '" target="_blank">' . $matches[0] . '</a>';
     }, $description);
 
