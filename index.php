@@ -3,7 +3,7 @@
 Plugin Name: Mureed Sultan
 Description: YouTube API Plugin
 Version: 1.0
-Author: Your Name
+Author: Mureed Sulta
 */
 
 // Add a menu item under Settings
@@ -48,14 +48,38 @@ function mureedsultan_options_page()
     // Get saved values
     $api_key = get_option('mureedsultan_api_key', '');
     $channel_id = get_option('mureedsultan_channel_id', '');
+    $playlist = get_option('mureedsultan_playlist', '');
+    $category = get_option('mureedsultan_category', '');
+    $time_format = get_option('mureedsultan_time', '');
+    $buzzprout_id = get_option('mureedsultan_buzzprout_id', '');
+    $buzzprout_api_key = get_option('mureedsultan_buzzprout_api_key', '');
+    $podcast_category = get_option('mureedsultan_podcast_category', '');
+    $update_time = get_option('mureedsultan_time', '');
+    $num_podcasts = get_option('mureedsultan_num_podcasts', '');
 
     // Update settings if form is submitted
     if (isset($_POST['mureedsultan_submit'])) {
         $api_key = sanitize_text_field($_POST['mureedsultan_api_key']);
         $channel_id = sanitize_text_field($_POST['mureedsultan_channel_id']);
+        $playlist = sanitize_text_field($_POST['mureedsultan_playlist']);
+        $category = sanitize_text_field($_POST['mureedsultan_category']);
+        $time_format = sanitize_text_field($_POST['mureedsultan_time']);
+        $buzzprout_id = sanitize_text_field($_POST['mureedsultan_buzzprout_id']);
+        $buzzprout_api_key = sanitize_text_field($_POST['mureedsultan_buzzprout_api_key']);
+        $podcast_category = sanitize_text_field($_POST['mureedsultan_podcast_category']);
+        $update_time = sanitize_text_field($_POST['mureedsultan_time']);
+        $num_podcasts = sanitize_text_field($_POST['mureedsultan_num_podcasts']);
 
         update_option('mureedsultan_api_key', $api_key);
         update_option('mureedsultan_channel_id', $channel_id);
+        update_option('mureedsultan_playlist', $playlist);
+        update_option('mureedsultan_category', $category);
+        update_option('mureedsultan_time', $time_format);
+        update_option('mureedsultan_buzzprout_id', $buzzprout_id);
+        update_option('mureedsultan_buzzprout_api_key', $buzzprout_api_key);
+        update_option('mureedsultan_podcast_category', $podcast_category);
+        update_option('mureedsultan_time', $update_time);
+        update_option('mureedsultan_num_podcasts', $num_podcasts);
 
         echo '<div class="notice notice-success"><p>Settings updated successfully.</p></div>';
     }
@@ -121,13 +145,13 @@ function mureedsultan_options_page()
                 <tr>
                     <th scope="row"><label for="mureedsultan_buzzprout_api_key">Buzzsprout API Key</label></th>
                     <td>
-                        <input type="text" id="mureedsultan_buzzprout_api_key" name="mureedsultan_buzzprout_api_key" value="<?php echo esc_attr($buzzprout_api_key); ?>" class="regular-text">
+                        <input type="text" id="mureedsultan_api_token" name="mureedsultan_api_token" value="<?php echo esc_attr($buzzprout_api_key); ?>" class="regular-text">
                     </td>
                 </tr>
                 <tr>
                     <th scope="row"><label for="mureedsultan_category">Post Category</label></th>
                     <td>
-                        <select id="mureedsultan_category" name="mureedsultan_category">
+                        <select id="mureedsultan_podcast_category" name="mureedsultan_podcast_category">
                             <?php
                             $categories = get_terms('category', 'orderby=name&hide_empty=0');
                             foreach ($categories as $category) {
@@ -137,14 +161,14 @@ function mureedsultan_options_page()
                         </select>
                     </td>
                 </tr>
-                <tr>
+                <!-- <tr>
                     <th scope="row"><label for="mureedsultan_time">Time to Update (minutes)</label></th>
                     <td>
                         <input type="number" id="mureedsultan_time" name="mureedsultan_time" value="<?php echo esc_attr(get_option('mureedsultan_time')); ?>" class="regular-text" min="1">
                     </td>
-                </tr>
+                </tr> -->
                 <tr>
-                    <th scope="row"><label for="mureedsultan_num_podcasts">Number of Podcasts</label></th>
+                    <th scope="row"><label for="mureedsultan_">Number of Podcasts</label></th>
                     <td>
                         <input type="number" id="mureedsultan_num_podcasts" name="mureedsultan_num_podcasts" value="<?php echo esc_attr($num_podcasts); ?>" class="regular-text" min="1">
                     </td>
@@ -162,13 +186,23 @@ function mureedsultan_options_page()
 
         <div id="mureedsultan_push_status"></div>
     </div>
+
+
+
+
+
+
     <script>
         jQuery(document).ready(function($) {
+
+
             // podcast data 
             $('#mureedsultan_podcast_fetch').on('click', function() {
-                var api_token = $('#mureedsultan_buzzprout_api_key').val();
+                var api_token = $('#mureedsultan_api_token').val();
                 var buzzprout_id = $('#mureedsultan_buzzprout_id').val();
-                console.log(api_token, buzzprout_id)
+                var category_id = $('#mureedsultan_podcast_category').val();
+                var num_podcasts = $('#mureedsultan_num_podcasts').val();
+
                 // Perform AJAX request to fetch podcast data
                 $.ajax({
                     url: 'https://www.buzzsprout.com/api/' + buzzprout_id + '/episodes.json',
@@ -176,7 +210,93 @@ function mureedsultan_options_page()
                         api_token: api_token
                     },
                     success: function(response) {
-                        console.log(response);
+                        var episodes = response.slice(0, num_podcasts); // Limit the number of podcasts to fetch
+                        episodes.forEach(function(episode, i) {
+                            var title = episode.title;
+                            var description = episode.description;
+                            var audio_url = episode.audio_url;
+                            var episode_number = episode.episode_number;
+                            var episode_id = episode.id;
+                            var episode_thumbnail = i ;
+                            // Perform AJAX request to fetch the transcript
+                            $.ajax({
+                                url: 'https://feeds.buzzsprout.com/' + buzzprout_id + '/' + episode_id + '/transcript',
+                                success: function(transcriptResponse) {
+                                    var transcript = transcriptResponse; // Assuming the transcript is returned as a string
+                                    // Perform AJAX request to push podcast data to post
+                                    $.ajax({
+                                        url: ajaxurl,
+                                        method: 'POST',
+                                        data: {
+                                            action: 'mureedsultan_push_podcasts',
+                                            title: title,
+                                            description: description,
+                                            audio_url: audio_url,
+                                            episode_number: episode_number,
+                                            episode_transcript: transcript,
+                                            episode_id: episode_id,
+                                            category_id: category_id,
+                                            episode_thumbnail: episode_thumbnail
+                                        },
+                                        success: function(response) {
+                                            console.log(response);
+                                        },
+                                        error: function(xhr, status, error) {
+                                            console.error('AJAX error:', error);
+                                        }
+                                    });
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('AJAX error:', error);
+                                }
+                            });
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX error:', error);
+                    }
+                });
+            });
+
+
+            $('#mureedsultan_podcast_push').on('click', function() {
+                var api_token = $('#mureedsultan_api_token').val();
+                var buzzprout_id = $('#mureedsultan_buzzprout_id').val();
+                var category_id = $('#mureedsultan_podcast_category').val();
+                var num_podcasts = $('#mureedsultan_num_podcasts').val();
+
+                // Perform AJAX request to fetch podcast data
+                $.ajax({
+                    url: 'https://www.buzzsprout.com/api/' + buzzprout_id + '/episodes.json',
+                    data: {
+                        api_token: api_token
+                    },
+                    success: function(response) {
+                        var episodes = response.slice(0, num_podcasts); // Limit the number of podcasts to push
+
+                        episodes.forEach(function(episode, i) {
+                            var title = episode.title;
+                            var description = episode.description;
+                            var audio_url = episode.audio_url;
+                            // Perform AJAX request to push podcast data to post
+                            $.ajax({
+                                url: ajaxurl, // Assumes you have the 'ajaxurl' variable defined in your script
+                                method: 'POST',
+                                data: {
+                                    action: 'mureedsultan_push_podcasts',
+                                    title: title,
+                                    description: description,
+                                    audio_url: audio_url,
+                                    category_id: category_id
+                                },
+                                success: function(response) {
+                                    console.log(response);
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('AJAX error:', error);
+                                }
+                            });
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.error('AJAX error:', error);
@@ -467,4 +587,133 @@ function mureedsultan_fetch_videos_callback()
         wp_send_json_error('Failed to fetch videos from the selected playlist.');
     }
 }
+// Create a new post using AJAX callback
+add_action('wp_ajax_mureedsultan_push_podcasts', 'mureedsultan_push_podcasts_callback');
+function mureedsultan_push_podcasts_callback()
+{
+    if (!current_user_can('edit_posts')) {
+        wp_send_json_error('You do not have sufficient permissions to create a post.');
+    }
+
+    $title = sanitize_text_field($_POST['title']);
+    $description = sanitize_text_field($_POST['description']);
+    $audio_url = esc_url_raw($_POST['audio_url']);
+    $transcript = sanitize_text_field($_POST['transcript']);
+    $category_id = intval($_POST['category_id']);
+    $episode_thumbnail = intval($_POST['episode_thumbnail']);
+
+    // Generate the image filename based on the post count
+    $image_filename = 'image-' . sprintf('%02d', $episode_thumbnail + 1) . '.png';
+
+    // Construct the full image URL
+    $thumbnail = 'http://localhost/aging/wp-content/uploads/2023/06/' . $image_filename;
+
+    $existing_post_args = array(
+        'post_type'      => 'post',
+        'post_title'     => $title,
+        'posts_per_page' => 1,
+        'tax_query'      => array(
+            array(
+                'taxonomy' => 'category',
+                'field'    => 'term_id',
+                'terms'    => $category_id
+            )
+        )
+    );
+    
+    $existing_posts = get_posts($existing_post_args);
+    
+    if ($existing_posts) {
+        wp_send_json_error('A post with the same title already exists in the selected category.');
+    }
+    
+
+
+    // Custom fields
+    $episode_number = sanitize_text_field($_POST['episode_number']);
+    $episode_transcript = sanitize_text_field($_POST['episode_transcript']);
+    $listen_on = $_POST['listen_on']; // Assuming this is a select field
+    $hosted_by = sanitize_text_field($_POST['hosted_by']);
+    $special_guest = sanitize_text_field($_POST['special_guest']);
+    $short_description = sanitize_text_field($_POST['short_description']);
+    $podcast_type = $_POST['podcast_type']; // Assuming this is a select field
+    $podcast_category = sanitize_text_field($_POST['podcast_category']);
+    $podcast_embed_episode_link = esc_url_raw($_POST['podcast_embed_episode_link']);
+    // Create a new post for the podcast
+    $post_args = array(
+        'post_title' => $title,
+        'post_content' => $description,
+        'post_status' => 'publish',
+        'post_category' => array($category_id)
+    );
+
+    $post_id = wp_insert_post($post_args);
+
+    if ($post_id) {
+        // Add custom fields to store podcast data
+        update_post_meta($post_id, 'audio_url', $audio_url);
+        update_post_meta($post_id, 'transcript', $transcript);
+        update_post_meta($post_id, '_thumbnail_id', '');
+        if (!empty($thumbnail)) {
+            $upload_dir = wp_upload_dir();
+            $image_data = file_get_contents($thumbnail);
+            $filename = basename($thumbnail);
+            $local_image_path = $upload_dir['path'] . '/' . $filename;
+            file_put_contents($local_image_path, $image_data);
+
+            $attachment = array(
+                'post_mime_type' => 'image/jpeg',
+                'post_title' => sanitize_file_name($filename),
+                'post_content' => '',
+                'post_status' => 'inherit'
+            );
+            $attach_id = wp_insert_attachment($attachment, $local_image_path, $post_id);
+            if (!is_wp_error($attach_id)) {
+                require_once(ABSPATH . 'wp-admin/includes/image.php');
+                $attach_data = wp_generate_attachment_metadata($attach_id, $local_image_path);
+                wp_update_attachment_metadata($attach_id, $attach_data);
+                set_post_thumbnail($post_id, $attach_id);
+            }
+        }
+
+        // Update custom fields with podcast data
+        if (!empty($episode_number)) {
+            $episode_field_key = 'epes';
+            update_field($episode_field_key, $episode_number, $post_id);
+        }
+
+        if (!empty($episode_transcript)) {
+            update_field('episode_transcript', $episode_transcript, $post_id);
+        }
+        if (!empty($listen_on)) {
+            update_field('listen_on', $listen_on, $post_id);
+        }
+        if (!empty($hosted_by)) {
+            update_field('hosted_by', $hosted_by, $post_id);
+        }
+        if (!empty($special_guest)) {
+            update_field('special_guest', $special_guest, $post_id);
+        }
+        if (!empty($short_description)) {
+            update_field('short_description', $short_description, $post_id);
+        }
+        if (!empty($podcast_type)) {
+            update_field('podcast_type', $podcast_type, $post_id);
+        }
+        if (!empty($podcast_category)) {
+            update_field('podcast_category', $podcast_category, $post_id);
+        }
+        if (!empty($podcast_embed_episode_link)) {
+            update_field('podcast_embed_episode_link', $podcast_embed_episode_link, $post_id);
+        }
+
+
+
+        wp_send_json_success('Podcast pushed successfully.');
+    }
+
+    wp_send_json_error('Failed to push podcast data to post.');
+}
+
+
 ?>
