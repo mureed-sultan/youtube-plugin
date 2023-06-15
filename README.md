@@ -79,17 +79,29 @@ Additionally, the settings page includes fields for the Buzzsprout integration:
 **AJAX Requests**
 
 AJAX requests in the plugin are used to communicate with the server and external APIs. They allow the plugin to fetch playlists from YouTube and push videos to WordPress without refreshing the page.
+## Creating a Post using AJAX Callback
 
-**Fetch Playlists:** When the user clicks the "Fetch Playlists" button, an AJAX request fetches the playlists from the YouTube API based on the provided API Key and YouTube Channel ID. The response updates the "Select Playlist" dropdown.
+This code snippet demonstrates the creation of a new post in WordPress using an AJAX callback. Here's a summary of the code:
 
-**Push Videos:** Similarly, when the user clicks the "Push Videos" button, another AJAX request sends the selected playlist ID to the server, which fetches the videos and performs necessary actions, such as creating WordPress posts. 
+- The callback function performs the following tasks:
+  - Checks the user's permissions to ensure they have the capability to edit posts. If not, it sends an error message as a JSON response.
+  - Sanitizes the input data received via the AJAX request, including the title, description, video ID, video URL, category ID, API key, video author, video type, and video category.
+  - Formats the raw description using a hypothetical `format_description()` function.
+  - Queries the WordPress database to check if an existing post with the same video ID already exists.
+  - If an existing post is found, it retrieves the post ID and prepares an array of arguments (`$post_args`) to update the existing post with the new data, including the updated title, description, status, and category.
+- The code snippet does not include the specific code to update the existing post or create a new post, leaving it as a placeholder for further implementation.
 
-**Fetch Podcasts:** When the "Fetch Podcasts" button is clicked, an AJAX request is sent to the Buzzsprout API to fetch the specified number of podcasts. The fetched podcasts' details are then used to create WordPress posts.
+Overall, this code handles the AJAX request, checks permissions, sanitizes data, checks for existing posts, and prepares the necessary data for updating an existing post or creating a new one. The specific implementation of updating or creating the post is not provided in this snippet.
+## Updating or Creating a WordPress Post
 
-**Push Podcasts:** When the "Push Podcasts" button is clicked, an AJAX request is sent for each fetched podcast to create a WordPress post with the podcast details, such as title, description, and audio URL.
+This code snippet updates or creates a WordPress post based on provided arguments. It sets the post title, content, status, and category. After the update or creation, the code performs various actions including adding a custom field for the video ID, setting the YouTube video thumbnail as the featured image, generating a relevant video URL, and updating Advanced Custom Fields (ACF) with video information. The code sends appropriate JSON responses for success and failure scenarios. Additionally, there is a helper function to format the description by converting URLs to clickable links and adding line breaks between paragraphs.
 
+## Fetching Videos via AJAX Callback
 
+This code snippet handles the AJAX callback for fetching videos from a YouTube playlist. It retrieves the playlist ID and API key from the AJAX request, sends a request to the YouTube API to retrieve playlist items, and sends JSON success or error responses based on the results.
+**Creating a New Post via AJAX Callback**
 
+This code snippet handles the creation of a new post using an AJAX callback. It ensures that the user has sufficient permissions to create a post and retrieves sanitized input data such as the title, description, audio URL, transcript, category ID, and episode thumbnail. It also performs checks to prevent the creation of duplicate posts with the same title and category. If a duplicate post is detected, an error response is sent.
 
 
 
