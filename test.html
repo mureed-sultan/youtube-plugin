@@ -1,0 +1,269 @@
+<style>
+    .buzz-container {
+      position: relative;
+      overflow: hidden;
+      width: 99%;
+      margin-left: 4px;
+    }
+    .buzz-slider-controls .slider-controls{
+        background-color:white !important;
+        border-radius: 50% !important;
+        padding: 10px !important;
+    }
+  .buzz-slider-controls svg{
+      width:50px;
+      height: 50px;
+  }
+    .buzz-container .slider-track {
+      display: flex;
+      transition: transform 0.3s ease-in-out;
+      padding: 0.2rem;
+    }
+  
+    .buzz-container .slider-item {
+      flex: 0 0 calc(100% / 3);
+      max-width: 361px;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.18);
+      background: white;
+      margin-right: 14px;
+    }
+  
+    .slider-controls {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+    }
+  
+    .buzz-slider-controls button {
+      margin: 0 5px;
+      padding: 5px 10px;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+    }
+  
+    .buzz-slider-controls button:focus,
+    .buzz-slider-controls button:hover {
+      border: none;
+      background-color: white !important;
+      cursor: pointer;
+    }
+  
+    .buzz-slider-controls button:focus svg,
+    .buzz-slider-controls button:hover svg {
+      fill: #F7E05F;
+    }
+  
+    .slider-controls i {
+      font-size: 20px;
+    }
+  
+    .slider-controls.prev-btn {
+      left: -6rem;
+    }
+  
+    .slider-controls.next-btn {
+      right: -6rem;
+      transform: rotate(180deg);
+  
+    }
+  
+   .buzz-container .title-block {
+      font-family: "Inter", Sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: left;
+      padding: 1rem 1rem 0;
+    }
+  
+    .buzz-container#buzz-container .youtube-icon {
+      display: flex;
+      padding: 0rem 1rem;
+    }
+  
+    @media only screen and (max-width: 768px) {
+      .slider-controls.prev-btn {
+        left: 0rem;
+      }
+  
+      .slider-controls.next-btn {
+        right: 0rem;
+      }
+  
+      .buzz-slider-controls button {
+        margin: 0 5px;
+        padding: 5px 10px;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+      }
+  
+      .buzz-container .slider-item {
+        flex: 0 0 100%;
+      }
+      .buzz-slider-controls svg{
+      width:16px;
+      height: 16px;
+  }
+    }
+      @media only screen and (max-width: 1410px) {
+      .slider-controls.prev-btn {
+        left: 0rem;
+      }
+  
+      .slider-controls.next-btn {
+        right: 0rem;
+      }
+    }
+  
+  </style>
+  
+  <div style="position: relative;">
+    <div id="buzz-container" class="buzz-container"></div>
+    <div id="buzz-slider-controls" class="buzz-slider-controls"></div>
+  </div>
+  
+  <script>
+    let currentIndex = 0;
+  
+    function getVideosFromAPI() {
+      const apiUrl = 'https://www.buzzsprout.com/api/765170/episodes.json?api_token=45b1c36eafa8179d17943c3635d09ca7';
+  
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const episodes = data;
+          const videoContainer = document.getElementById('buzz-container');
+          const sliderTrack = document.createElement('div');
+          sliderTrack.classList.add('slider-track');
+  
+          let html = '';
+          for (let i = 0; i < episodes.length; i++) {
+            const title = episodes[i].title;
+            const thumbnail = episodes[i].artwork_url;
+            const episodeId = episodes[i].id;
+  
+  const plainTitle = title.toLowerCase().replace(/\s+/g, '-').replace(/-+/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+  const podcastUrl = `https://theaging.ai/podcast?${plainTitle}-${encodeURIComponent(episodeId)}`;
+  // const imageIndex = (Math.floor(Math.random() * 75) + 1).toString().padStart(2, '0');
+  
+            const imageIndex =(i + 1).toString().padStart(2, '0');
+            const imageFileName = `https://theaging.ai/wp-content/uploads/2023/06/image-${imageIndex}.png`;
+  
+            html += `
+              <div class="slider-item">
+                <article class="wpr-grid-item">
+                  <div class="wpr-grid-item-inner">
+                    <a href="${podcastUrl}">
+                      <div class="wpr-grid-media-wrap wpr-effect-size-medium" data-overlay-link="yes" style="cursor: pointer">
+                        <div class="wpr-grid-image-wrap" data-src="${thumbnail}">
+                          <img decoding="async" src="${imageFileName}" alt="${title}" class="wpr-anim-timing-ease-default" />
+                        </div>
+                        <div class="wpr-grid-media-hover wpr-animation-wrap">
+                          <div class="wpr-grid-media-hover-bg wpr-overlay-fade-in wpr-anim-size-medium wpr-anim-timing-ease-default wpr-anim-transparency"
+                            data-url="https://theaging.ai/videos/empowering-seniors-through-ai-powered-care-with-chatgpt">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="wpr-grid-item-below-content elementor-clearfix padding-left">
+                        <h2 class="wpr-grid-item-title elementor-repeater-item-f26cada wpr-grid-item-display-block wpr-grid-item-align-left wpr-pointer-none wpr-pointer-line-fx wpr-pointer-fx-slide">
+                          <div class="title-block">
+                            <a target="_self" href="${podcastUrl}">${title}</a>
+                          </div>
+                          <div class="youtube-icon">
+                            <span>
+                              <i class="wpr-grid-extra-icon-left fas fa-microphone"></i>
+                              <span>Podcast</span>
+                            </span>
+                          </div>
+                        </h2>
+                      </div>
+                    </a>
+                  </div>
+                </article>
+              </div>
+            `;
+  
+            if (i >= 20) {
+              break;
+            }
+          }
+  
+          sliderTrack.innerHTML = html;
+          videoContainer.appendChild(sliderTrack);
+          initSlider();
+        })
+        .catch(error => {
+          console.error('Error fetching episodes:', error);
+        });
+    }
+  
+    function initSlider() {
+      const videoContainer = document.getElementById('buzz-container');
+      const sliderTrack = videoContainer.querySelector('.slider-track');
+      const sliderItems = sliderTrack.querySelectorAll('.slider-item');
+      const sliderPrev = document.createElement('button');
+      sliderPrev.classList.add('slider-controls', 'prev-btn');
+      sliderPrev.innerHTML = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 338.4" style="enable-background:new 0 0 512 338.4;" xml:space="preserve">
+    <polygon class="st0" points="511.4,183.1 53.4,183.1 188.9,318.7 169.2,338.4 0,169.2 169.2,0 188.9,19.7 53.4,155.3 511.4,155.3"></polygon>
+  </svg>`;
+  
+      const sliderNext = document.createElement('button');
+      sliderNext.classList.add('slider-controls', 'next-btn');
+      sliderNext.innerHTML =  `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 338.4" style="enable-background:new 0 0 512 338.4;" xml:space="preserve"><g><polygon class="st0" points="511.4,183.1 53.4,183.1 188.9,318.7 169.2,338.4 0,169.2 169.2,0 188.9,19.7 53.4,155.3 511.4,155.3 "></polygon></g></svg>`;
+  
+      let slideWidth = 0;
+  function moveSlider() {
+    slideWidth = 375;
+    const translateX = -currentIndex * slideWidth;
+    sliderTrack.style.transform = `translateX(${translateX}px)`;
+  }
+  
+      function adjustCurrentIndex() {
+        const containerWidth = videoContainer.offsetWidth;
+        const maxVisibleSlides = Math.floor(containerWidth / slideWidth);
+        const totalSlides = sliderItems.length;
+        const maxIndex = Math.floor(totalSlides / maxVisibleSlides) - 1;
+  
+        if (currentIndex > maxIndex) {
+          currentIndex = maxIndex;
+          moveSlider();
+        }
+      }
+  
+      function handlePrevClick() {
+        if (currentIndex > 0) {
+          currentIndex--;
+          moveSlider();
+        }
+      }
+  
+      function handleNextClick() {
+        const maxIndex = Math.floor(sliderItems.length / 3)*3 - 5;
+        if (currentIndex < maxIndex) {
+          currentIndex++;
+          moveSlider();
+        }
+      }
+  
+      sliderPrev.addEventListener('click', handlePrevClick);
+      sliderNext.addEventListener('click', handleNextClick);
+  
+      const sliderNav = document.getElementById('buzz-slider-controls');
+      sliderNav.appendChild(sliderPrev);
+      sliderNav.appendChild(sliderNext);
+  
+      window.addEventListener('resize', () => {
+        adjustCurrentIndex();
+        moveSlider();
+      });
+  
+      moveSlider();
+    }
+  
+    getVideosFromAPI();
+  </script>
+  
+  
