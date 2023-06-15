@@ -1,4 +1,4 @@
-**WordPress YouTube and Buzzsprout Integration**
+## WordPress YouTube and Buzzsprout Integration
 
 **Plugin Overview**
 
@@ -76,7 +76,7 @@ Additionally, the settings page includes fields for the Buzzsprout integration:
 **Push Podcasts Button:** A button to push the fetched podcasts to WordPress posts.
 
 
-**AJAX Requests**
+## AJAX Requests
 
 AJAX requests in the plugin are used to communicate with the server and external APIs. They allow the plugin to fetch playlists from YouTube and push videos to WordPress without refreshing the page.
 ## Creating a Post using AJAX Callback
@@ -99,9 +99,20 @@ This code snippet updates or creates a WordPress post based on provided argument
 ## Fetching Videos via AJAX Callback
 
 This code snippet handles the AJAX callback for fetching videos from a YouTube playlist. It retrieves the playlist ID and API key from the AJAX request, sends a request to the YouTube API to retrieve playlist items, and sends JSON success or error responses based on the results.
-**Creating a New Post via AJAX Callback**
+
+## Creating a New Post via AJAX Callback
 
 This code snippet handles the creation of a new post using an AJAX callback. It ensures that the user has sufficient permissions to create a post and retrieves sanitized input data such as the title, description, audio URL, transcript, category ID, and episode thumbnail. It also performs checks to prevent the creation of duplicate posts with the same title and category. If a duplicate post is detected, an error response is sent.
 
+##  Handling Custom Fields
+
+This code snippet handles custom fields for a podcast post. It retrieves and sanitizes input data such as episode number, transcript, "listen on" field, host, guest, short description, podcast type, category, and embedded episode link. It then creates a new post with the specified title, content, status, and category. The code does not include the specific implementation of custom field handling.
+
+## Code Summary: Custom Fields and Featured Image Handling
+
+The code creates a new post and sets custom fields and a featured image. It uses `wp_insert_post()` to create the post and `update_post_meta()` to store custom field values. The code retrieves a thumbnail image from a URL, saves it locally, and attaches it to the post using `wp_insert_attachment()`. Finally, it sets the attached image as the featured image using `set_post_thumbnail()`.
 
 
+## Code Summary: Updating Custom Fields with Podcast Data
+
+The code updates custom fields with podcast-related data. It checks if each field has a value and uses `update_field()` to update the respective field with the corresponding value for the given post ID (`$post_id`). The custom fields being updated include episode number, episode transcript, listening platforms, host name, special guest, short description, podcast type, podcast category, and embedded episode link. If all updates are successful, it sends a JSON response indicating the successful podcast push. If any update fails, it sends a JSON response indicating the failure.
