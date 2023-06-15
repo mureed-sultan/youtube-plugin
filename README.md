@@ -1,21 +1,22 @@
 ## WordPress YouTube and Buzzsprout Integration
 
-**Plugin Overview**
+## Plugin Overview
 
 The "Mureed Sultan" plugin is a WordPress plugin that integrates with the YouTube API and Buzzsprout API to fetch and push YouTube videos and Buzzsprout podcasts to your WordPress website. It provides a settings page where users can enter their API keys and configure various options for fetching and pushing videos and podcasts.
 
 
-**Plugin Functionality**
+## Plugin Functionality
 
 The Mureed Sultan plugin adds a menu item under the "Settings" section in the WordPress admin panel. The menu item allows users with sufficient permissions to access the Mureed Sultan Plugin settings page.
 
 
-**Settings Page**
+## Settings Page
 
 The settings page provides a form where users can configure the plugin settings. The form includes the following fields:
 
 
-**YouTube API Key:** To obtain the API key required for the plugin, follow these steps:
+**YouTube API Key:**
+To obtain the API key required for the plugin, follow these steps:
 
 -Go to the Google Developers Console (console.developers.google.com) and sign in with their Google account.
 
@@ -37,7 +38,8 @@ The settings page provides a form where users can configure the plugin settings.
 
 -Paste the API key into the "YouTube API Key" field on the plugin's settings page.
 
-**YouTube Channel ID:**  The YouTube Channel ID is a unique identifier assigned to a specific YouTube channel. It is used to identify and access the content associated with that channel. 
+**YouTube Channel ID:**
+The YouTube Channel ID is a unique identifier assigned to a specific YouTube channel. It is used to identify and access the content associated with that channel. 
 
 To obtain the YouTube Channel ID, the user needs to visit the YouTube channel they want to fetch videos from. They can find the Channel ID by either inspecting the source code of the YouTube channel page or by following certain steps such as:
 
@@ -108,11 +110,11 @@ This code snippet handles the creation of a new post using an AJAX callback. It 
 
 This code snippet handles custom fields for a podcast post. It retrieves and sanitizes input data such as episode number, transcript, "listen on" field, host, guest, short description, podcast type, category, and embedded episode link. It then creates a new post with the specified title, content, status, and category. The code does not include the specific implementation of custom field handling.
 
-## Code Summary: Custom Fields and Featured Image Handling
+## Custom Fields and Featured Image Handling
 
 The code creates a new post and sets custom fields and a featured image. It uses `wp_insert_post()` to create the post and `update_post_meta()` to store custom field values. The code retrieves a thumbnail image from a URL, saves it locally, and attaches it to the post using `wp_insert_attachment()`. Finally, it sets the attached image as the featured image using `set_post_thumbnail()`.
 
 
-## Code Summary: Updating Custom Fields with Podcast Data
+## Updating Custom Fields with Podcast Data
 
 The code updates custom fields with podcast-related data. It checks if each field has a value and uses `update_field()` to update the respective field with the corresponding value for the given post ID (`$post_id`). The custom fields being updated include episode number, episode transcript, listening platforms, host name, special guest, short description, podcast type, podcast category, and embedded episode link. If all updates are successful, it sends a JSON response indicating the successful podcast push. If any update fails, it sends a JSON response indicating the failure.
